@@ -41,7 +41,7 @@ class RegDev extends UserInfo{
 	public function dbDevCheck(){
 		$Checksql = "SELECT COUNT(DevID) FROM Device WHERE DevID = :DevID";
 		$Checkpre = $this->dbh->prepare($Checksql);
-		$Checkpre->bindvalue(":DevID",$this->devID,PDO::PARAM_STR);
+		$Checkpre->bindvalue(":DevID",$this->devID,PDO::PARAM_INT);
 		if($Checkpre->execute()){
 			if($Checkpre->fetchColumn() == 0){
 				return true;
@@ -50,6 +50,13 @@ class RegDev extends UserInfo{
 		return false;
 	}
 
+	public function devDesc(){
+		$descDevsql = "UPDATE Device SET Expl=:devExpl WHERE DevID=:DevID";
+		$descDevpre = $this->dbh->prepare($descDevsql);
+		$descDevpre->bindvalue(":DevID",$this->devID,PDO::PARAM_INT);
+		$descDevpre->bindvalue(":devExpl",$this->devExpl,PDO::PARAM_STR);
+		return $descDevpre->execute();
+	}
 }
 
 $regDev = new RegDev($dsn, $db_user, $db_pass);
@@ -97,6 +104,7 @@ if($regDev->Auth()){
 		$Response['DB_Result'] +=array('RegDev'=>$regDev->setDev2db());
 	}else{
 		$Response['DB_Result'] +=array('Duplication'=>true);
+		$Response['DB_Result'] +=array('AddDevDescriptions'=>$regDev->devDesc());
 	}
 }else{
 	$Response = array_merge($Response,array('DB_Result'=>array('Auth'=>false)));
