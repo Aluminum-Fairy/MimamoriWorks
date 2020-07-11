@@ -4,7 +4,6 @@ require_once(__DIR__."/../../../lib/MW/UserInfo.php");
 header("Content-Type: application/json; charset=utf-8");
 
 class RegDev extends UserInfo{
-	private $Dupl = false;
 	private $devExpl;
 	private $devID;
 	private $devName;
@@ -18,7 +17,7 @@ class RegDev extends UserInfo{
 	}
 
 	public function inputDevID($input){
-		$this->devID = $input;
+		$this->devID = (float)$input;
 	}
 
 	public function inputDevName($input){
@@ -26,22 +25,26 @@ class RegDev extends UserInfo{
 	}
 
 	public function setDev2db(){
-		$regDev_SQL="INSERT INTO Device (`DevID`,`DevName`,`Expl`) values (:DevID,:DevName,:Expl)";
-		$regDev_Pre=$this->dbh->prepare($regDev_SQL);
-		$regDev_Pre->bindvalue(":DevID",$this->devID,PDO::PARAM_STR);
-		$regDev_Pre->bindvalue(":DevName",$this->devName,PDO::PARAM_STR);
-		$regDev_Pre->bindValue(":Expl",$this->devExpl,PDO::PARAM_STR);
-		$regDev_Res = $regDev_Pre->execute();
+		$regDevsql="INSERT INTO Device (`DevID`,`DevName`,`Expl`) values (:DevID,:DevName,:Expl)";
+		if(is_null($this->devExpl)){
+			$regDevsql="INSERT INTO Device (`DevID`,`DevName`) values (:DevID,:DevName)";
+		}
+		$regDevpre=$this->dbh->prepare($regDevsql);
+		$regDevpre->bindvalue(":DevID",$this->devID,PDO::PARAM_INT);
+		$regDevpre->bindvalue(":DevName",$this->devName,PDO::PARAM_STR);
+		if(!(is_null($this->devExpl))){
+			$regDevpre->bindValue(":Expl",$this->devExpl,PDO::PARAM_STR);
+		}
+		$regDev_Res = $regDevpre->execute();
 		return $regDev_Res;
 	}
 
 	public function dbDevCheck(){
-		$Check_SQL = "SELECT COUNT(DevID) FROM Device WHERE DevID = :DevID";
-		$Check_Pre = $this->dbh->prepare($Check_SQL);
-		$Check_Pre->bindvalue(":DevID",$this->,PDO::PARAM_STR);
-		$ResCheck = $Check_Pre->execute();
-		if($ResCheck){
-			if($Check_Pre->fetchColumn() == 0){
+		$Checksql = "SELECT COUNT(DevID) FROM Device WHERE DevID = :DevID";
+		$Checkpre = $this->dbh->prepare($Checksql);
+		$Checkpre->bindvalue(":DevID",$this->devID,PDO::PARAM_STR);
+		if($Checkpre->execute()){
+			if($Checkpre->fetchColumn() == 0){
 				return true;
 			}
 		}
@@ -88,6 +91,17 @@ if(filter_input(INPUT_POST,'Passwd')){
 	$Response = array_merge($Response,array('Passwd'=>false));
 }
 
+if($regDev->Auth()){
+	$Response = array_merge($Response,array('DB_Result'=>array('Auth'=>true)));
+	if($regDev->dbDevCheck()){
+		$Response['DB_Result'] +=array('Duplication'=>false);
+		$Response['DB_Result'] +=array('RegDev'=>$regDev->setDev2db());
+	}else{
+		$Response['DB_Result'] +=array('Duplication'=>true);
+	}
+}else{
+	$Response = array_merge($Response,array('DB_Result'=>array('Auth'=>false)));
+}
 
 $ResJ = json_encode($Response);
 echo $ResJ;

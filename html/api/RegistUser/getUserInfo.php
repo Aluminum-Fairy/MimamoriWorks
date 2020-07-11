@@ -4,30 +4,27 @@ require_once(__DIR__."/../../../lib/MW/UserInfo.php");
 header("Content-Type: application/json; charset=utf-8");
 
 class RegUI extends UserInfo{
-	private $Dupl = false;
-	private $DevID;
 
 	function __construct($dsn, $db_user, $db_pass){
 		$this->dbh = new PDO($dsn, $db_user, $db_pass);
 	}
 
 	public function setUI2db(){
-		$regUI_SQL="INSERT INTO user (`name`,`mailaddr`,`Passwd`) values (:name,:mailAddr,:PasswdHash)";
-		$regUI_Pre=$this->dbh->prepare($regUI_SQL);
-		$regUI_Pre->bindvalue(":name",$this->userName,PDO::PARAM_STR);
-		$regUI_Pre->bindvalue(":mailAddr",$this->mailAddr,PDO::PARAM_STR);
-		$regUI_Pre->bindValue(":PasswdHash",password_hash($this->Passwd, PASSWORD_DEFAULT),PDO::PARAM_STR);
-		$regUI_Res = $regUI_Pre->execute();
+		$regUIsql="INSERT INTO user (`name`,`mailaddr`,`Passwd`) values (:name,:mailAddr,:PasswdHash)";
+		$regUIpre=$this->dbh->prepare($regUIsql);
+		$regUIpre->bindvalue(":name",$this->userName,PDO::PARAM_STR);
+		$regUIpre->bindvalue(":mailAddr",$this->mailAddr,PDO::PARAM_STR);
+		$regUIpre->bindValue(":PasswdHash",password_hash($this->Passwd, PASSWORD_DEFAULT),PDO::PARAM_STR);
+		$regUI_Res = $regUIpre->execute();
 		return $regUI_Res;
 	}
 
 	public function DBUICheck(){
-		$Check_SQL = "SELECT COUNT(id) FROM user WHERE mailaddr = :mailAddr";
-		$Check_Pre = $this->dbh->prepare($Check_SQL);
-		$Check_Pre->bindvalue(":mailAddr",$this->mailAddr,PDO::PARAM_STR);
-		$ResCheck = $Check_Pre->execute();
-		if($ResCheck){
-			if($Check_Pre->fetchColumn() == 0){
+		$checkSQL = "SELECT COUNT(id) FROM user WHERE mailaddr = :mailAddr";
+		$checkPre = $this->dbh->prepare($checkSQL);
+		$checkPre->bindvalue(":mailAddr",$this->mailAddr,PDO::PARAM_STR);
+		if($checkPre->execute()){
+			if($checkPre->fetchColumn() == 0){
 				return true;
 			}
 		}
@@ -61,13 +58,8 @@ if(filter_input(INPUT_POST,'Passwd')){
 }
 
 if($regUI->DBUICheck()){
-	if($regUI->setUI2db()){
-		$Response = array_merge($Response,array('DB_Result'=>array('RegistUI'=>true)));
-		$Response['DB_Result'] +=array('Duplication'=>false);
-	}else{
-		$Response = array_merge($Response,array('DB_Result'=>array('RegistUI'=>false)));
-		$Response['DB_Result'] +=array('Duplication'=>false);
-	}
+	$Response = array_merge($Response,array('DB_Result'=>array('RegistUI'=>$regUI->setUI2db())));
+	$Response['DB_Result'] +=array('Duplication'=>false);
 }else{
 	$Response = array_merge($Response,array('DB_Result'=>array('RegistUI'=>false)));
 	$Response['DB_Result'] +=array('Duplication'=>true);
