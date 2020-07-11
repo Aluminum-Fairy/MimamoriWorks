@@ -35,8 +35,7 @@ class RegDev extends UserInfo{
 		if(!(is_null($this->devExpl))){
 			$regDevpre->bindValue(":Expl",$this->devExpl,PDO::PARAM_STR);
 		}
-		$regDev_Res = $regDevpre->execute();
-		return $regDev_Res;
+		return  $regDevpre->execute();
 	}
 
 	public function dbDevCheck(){

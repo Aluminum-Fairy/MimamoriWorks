@@ -15,8 +15,7 @@ class RegUI extends UserInfo{
 		$regUIpre->bindvalue(":name",$this->userName,PDO::PARAM_STR);
 		$regUIpre->bindvalue(":mailAddr",$this->mailAddr,PDO::PARAM_STR);
 		$regUIpre->bindValue(":PasswdHash",password_hash($this->Passwd, PASSWORD_DEFAULT),PDO::PARAM_STR);
-		$regUI_Res = $regUIpre->execute();
-		return $regUI_Res;
+		return $regUIpre->execute();
 	}
 
 	public function DBUICheck(){
