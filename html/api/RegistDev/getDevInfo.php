@@ -7,9 +7,11 @@ class RegDev extends UserInfo{
 	private $devExpl;
 	private $devID;
 	private $devName;
+	private $devToken;
 
 	function __construct($dsn, $db_user, $db_pass){
 		$this->dbh = new PDO($dsn, $db_user, $db_pass);
+		$this->genToken();
 	}
 
 	public function inputDevExpl($input){
@@ -24,14 +26,19 @@ class RegDev extends UserInfo{
 		$this->devName = $input;
 	}
 
+	public function getDevToken(){
+		return $this->devToken;
+	}
+
 	public function setDev2db(){
-		$regDevsql="INSERT INTO Device (`DevID`,`DevName`,`Expl`) values (:DevID,:DevName,:Expl)";
+		$regDevsql="INSERT INTO Device (`DevID`,`DevName`,`DevToken`,`Expl`) values (:DevID,:DevName,:DevToken,:Expl)";
 		if(is_null($this->devExpl)){
-			$regDevsql="INSERT INTO Device (`DevID`,`DevName`) values (:DevID,:DevName)";
+			$regDevsql="INSERT INTO Device (`DevID`,`DevName`,`DevToken`) values (:DevID,:DevName,:DevToken)";
 		}
 		$regDevpre=$this->dbh->prepare($regDevsql);
-		$regDevpre->bindvalue(":DevID",$this->devID,PDO::PARAM_INT);
+		$regDevpre->bindvalue(":DevID",$this->devID,PDO::PARAM_STR);
 		$regDevpre->bindvalue(":DevName",$this->devName,PDO::PARAM_STR);
+		$regDevpre->bindvalue(":DevToken",$this->devToken,PDO::PARAM_STR);
 		if(!(is_null($this->devExpl))){
 			$regDevpre->bindValue(":Expl",$this->devExpl,PDO::PARAM_STR);
 		}
@@ -56,6 +63,10 @@ class RegDev extends UserInfo{
 		$descDevpre->bindvalue(":DevID",$this->devID,PDO::PARAM_INT);
 		$descDevpre->bindvalue(":devExpl",$this->devExpl,PDO::PARAM_STR);
 		return $descDevpre->execute();
+	}
+
+	private function genToken(){
+		$this->devToken = rand(1000000,9999999);
 	}
 }
 
@@ -102,6 +113,7 @@ if($regDev->Auth()){
 	if($regDev->dbDevCheck()){
 		$Response['DB_Result'] +=array('Duplication'=>false);
 		$Response['DB_Result'] +=array('RegDev'=>$regDev->setDev2db());
+		$Response['DB_Result'] +=array('DevToken'=>$regDev->getDevToken());
 	}else{
 		$Response['DB_Result'] +=array('Duplication'=>true);
 		$Response['DB_Result'] +=array('AddDevDescriptions'=>$regDev->devDesc());
