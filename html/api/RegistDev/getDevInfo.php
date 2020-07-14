@@ -80,9 +80,11 @@ if($userInfo->userAuth()){
 		$Response['DB_Result'] +=array('Duplication'=>false);
 		$Response['DB_Result'] +=array('RegDev'=>$regDev->setDev2db());
 		$Response['DB_Result'] +=array('DevToken'=>$regDev->getDevToken());
+		$Response['DB_Result'] +=array('getToken'=>true);
 	}else{
 		$Response['DB_Result'] +=array('Duplication'=>true);
 		$Response['DB_Result'] +=array('AddDevDescriptions'=>$regDev->devDesc());
+		$Response['DB_Result'] +=array('getToken'=>false);
 	}
 }else{
 	$Response = array_merge($Response,array('DB_Result'=>array('Auth'=>false)));
