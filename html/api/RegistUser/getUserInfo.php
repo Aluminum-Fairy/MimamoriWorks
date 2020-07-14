@@ -18,18 +18,6 @@ class RegUI extends UserInfo{
 		return $regUIpre->execute();
 	}
 
-	public function DBUICheck(){
-		$checkSQL = "SELECT COUNT(id) FROM user WHERE mailaddr = :mailAddr";
-		$checkPre = $this->dbh->prepare($checkSQL);
-		$checkPre->bindvalue(":mailAddr",$this->mailAddr,PDO::PARAM_STR);
-		if($checkPre->execute()){
-			if($checkPre->fetchColumn() == 0){
-				return true;
-			}
-		}
-		return false;
-	}
-
 }
 
 $regUI = new RegUI($dsn, $db_user, $db_pass);
@@ -56,7 +44,7 @@ if(filter_input(INPUT_POST,'Passwd')){
 	$Response = array_merge($Response,array('Passwd'=>false));
 }
 
-if($regUI->DBUICheck()){
+if($regUI->dbUICheck()){
 	$Response = array_merge($Response,array('DB_Result'=>array('RegistUI'=>$regUI->setUI2db())));
 	$Response['DB_Result'] +=array('Duplication'=>false);
 }else{

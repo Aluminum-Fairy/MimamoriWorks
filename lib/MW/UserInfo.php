@@ -5,6 +5,10 @@ class UserInfo{
 	protected $Passwd;
 	protected $dbh;
 
+	function __construct($dsn, $db_user, $db_pass){
+		$this->dbh = new PDO($dsn, $db_user, $db_pass);
+	}
+
 	public function inputMail($input){
 		$this->mailAddr = $input;
 	}
@@ -17,7 +21,7 @@ class UserInfo{
 		$this->Passwd = $input;
 	}
 
-	public function Auth(){
+	public function userAuth(){
 		if(is_null($this->mailAddr) || is_null($this->Passwd)){
 			return false;
 		}
@@ -30,5 +34,28 @@ class UserInfo{
 		}
 		return false;
 
+	}
+
+	public function chPasswd($newPasswd){
+		if(!$this->userAuth()){
+			return false;
+		}
+		$chPasswdsql="UPDATE user SET Passwd = :newPasswd WHERE mailaddr = :mailAddr";
+		$chPasswdpre=$this->dbh->prepare($chPasswdsql);
+		$chPasswdpre->bindValue(":newPasswd",$newPasswd,PDO::PARAM_STR);
+		$chPasswdpre->bindValue(":mailAddr",$this->mailAddr,PDO::PARAM_STR);
+		return $chPasswdpre->execute();
+	}
+
+	public function dbUICheck(){
+		$checkSQL = "SELECT COUNT(id) FROM user WHERE mailaddr = :mailAddr";
+		$checkPre = $this->dbh->prepare($checkSQL);
+		$checkPre->bindvalue(":mailAddr",$this->mailAddr,PDO::PARAM_STR);
+		if($checkPre->execute()){
+			if($checkPre->fetchColumn() == 0){
+				return true;
+			}
+		}
+		return false;
 	}
 }

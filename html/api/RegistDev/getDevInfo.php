@@ -1,33 +1,14 @@
 <?php
 require_once(__DIR__."/../../../config/SQL_Login.php");
 require_once(__DIR__."/../../../lib/MW/UserInfo.php");
+require_once(__DIR__."/../../../lib/MW/DevInfo.php");
 header("Content-Type: application/json; charset=utf-8");
 
-class RegDev extends UserInfo{
-	private $devExpl;
-	private $devID;
-	private $devName;
-	private $devToken;
+class RegDev extends DevInfo{
 
 	function __construct($dsn, $db_user, $db_pass){
 		$this->dbh = new PDO($dsn, $db_user, $db_pass);
 		$this->genToken();
-	}
-
-	public function inputDevExpl($input){
-		$this->devExpl = $input;
-	}
-
-	public function inputDevID($input){
-		$this->devID = (float)$input;
-	}
-
-	public function inputDevName($input){
-		$this->devName = $input;
-	}
-
-	public function getDevToken(){
-		return $this->devToken;
 	}
 
 	public function setDev2db(){
@@ -45,18 +26,6 @@ class RegDev extends UserInfo{
 		return  $regDevpre->execute();
 	}
 
-	public function dbDevCheck(){
-		$Checksql = "SELECT COUNT(DevID) FROM Device WHERE DevID = :DevID";
-		$Checkpre = $this->dbh->prepare($Checksql);
-		$Checkpre->bindvalue(":DevID",$this->devID,PDO::PARAM_INT);
-		if($Checkpre->execute()){
-			if($Checkpre->fetchColumn() == 0){
-				return true;
-			}
-		}
-		return false;
-	}
-
 	public function devDesc(){
 		$descDevsql = "UPDATE Device SET Expl=:devExpl WHERE DevID=:DevID";
 		$descDevpre = $this->dbh->prepare($descDevsql);
@@ -64,13 +33,10 @@ class RegDev extends UserInfo{
 		$descDevpre->bindvalue(":devExpl",$this->devExpl,PDO::PARAM_STR);
 		return $descDevpre->execute();
 	}
-
-	private function genToken(){
-		$this->devToken = rand(1000000,9999999);
-	}
 }
 
 $regDev = new RegDev($dsn, $db_user, $db_pass);
+$userInfo = new UserInfo($dsn, $db_user, $db_pass);
 $Response;																		//結果出力用配列
 
 if(filter_input(INPUT_POST,'devID',FILTER_VALIDATE_INT)){
@@ -95,20 +61,20 @@ if(filter_input(INPUT_POST,'devExpl')){
 }
 
 if(filter_input(INPUT_POST,'mailAddr',FILTER_VALIDATE_EMAIL)){
-	$regDev->inputMail($_POST['mailAddr']);
+	$userInfo->inputMail($_POST['mailAddr']);
 	$Response = array_merge($Response,array('Mail'=>true));
 }else{
 	$Response = array_merge($Response,array('Mail'=>false));
 }
 
 if(filter_input(INPUT_POST,'Passwd')){
-	$regDev->inputPasswd($_POST['Passwd']);
+	$userInfo->inputPasswd($_POST['Passwd']);
 	$Response = array_merge($Response,array('Passwd'=>true));
 }else{
 	$Response = array_merge($Response,array('Passwd'=>false));
 }
 
-if($regDev->Auth()){
+if($userInfo->userAuth()){
 	$Response = array_merge($Response,array('DB_Result'=>array('Auth'=>true)));
 	if($regDev->dbDevCheck()){
 		$Response['DB_Result'] +=array('Duplication'=>false);
