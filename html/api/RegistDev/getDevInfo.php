@@ -17,9 +17,9 @@ class RegDev extends DevInfo{
 			$regDevsql="INSERT INTO Device (`DevID`,`DevName`,`DevToken`) values (:DevID,:DevName,:DevToken)";
 		}
 		$regDevpre=$this->dbh->prepare($regDevsql);
-		$regDevpre->bindvalue(":DevID",$this->devID,PDO::PARAM_STR);
-		$regDevpre->bindvalue(":DevName",$this->devName,PDO::PARAM_STR);
-		$regDevpre->bindvalue(":DevToken",$this->devToken,PDO::PARAM_STR);
+		$regDevpre->bindValue(":DevID",$this->devID,PDO::PARAM_STR);
+		$regDevpre->bindValue(":DevName",$this->devName,PDO::PARAM_STR);
+		$regDevpre->bindValue(":DevToken",$this->devToken,PDO::PARAM_STR);
 		if(!(is_null($this->devExpl))){
 			$regDevpre->bindValue(":Expl",$this->devExpl,PDO::PARAM_STR);
 		}
@@ -29,8 +29,8 @@ class RegDev extends DevInfo{
 	public function devDesc(){
 		$descDevsql = "UPDATE Device SET Expl=:devExpl WHERE DevID=:DevID";
 		$descDevpre = $this->dbh->prepare($descDevsql);
-		$descDevpre->bindvalue(":DevID",$this->devID,PDO::PARAM_INT);
-		$descDevpre->bindvalue(":devExpl",$this->devExpl,PDO::PARAM_STR);
+		$descDevpre->bindValue(":DevID",$this->devID,PDO::PARAM_INT);
+		$descDevpre->bindValue(":devExpl",$this->devExpl,PDO::PARAM_STR);
 		return $descDevpre->execute();
 	}
 }

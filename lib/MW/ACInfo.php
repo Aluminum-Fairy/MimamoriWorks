@@ -1,9 +1,9 @@
 <?php
 class ACInfo{
 	protected $settingID;
-	protected $ACname;
-	protected $mode;
-	protected $volue;
+	protected $acName;
+	protected $acMode;
+	protected $acVolume;
 	protected $dbh;
 
 	function __construct($dsn, $db_user, $db_pass){
@@ -14,15 +14,27 @@ class ACInfo{
 		$this->settingID = $input;
 	}
 
+	public function inputACname($input){
+		$this->acName = $input;
+	}
+
+	public function inputACmode($input){
+		$this->acMode = $input;
+	}
+
+	public function inputACvolume($input){
+		$this->acVolue = $input;
+	}
+
 	public function acStatus(){
 		if(is_null($this->settingID)){
 			return false;
 		}
-		$getStatussql="SELECT `ACname`,`temp`,`mode`,`volume` FROM `airCon` WHERE `settingID`=:settingID";
-		$getStatuspre=$this->dbh->prepare($getStatussql);
-		$getStatuspre->bindValue(":settingID",$this->settingID,PDO::PARAM_STR);
-		if($getStatuspre->execute()){
-			return $getStatuspre->fetch();
+		$getStatusSql="SELECT `ACname`,`temp`,`mode`,`volume` FROM `airCon` WHERE `settingID`=:settingID";
+		$getStatusPre=$this->dbh->prepare($getStatusSql);
+		$getStatusPre->bindValue(":settingID",$this->settingID,PDO::PARAM_STR);
+		if($getStatusPre->execute()){
+			return $getStatusPre->fetch();
 		}
 		return false;
 	}

@@ -38,12 +38,12 @@ class Devinfo{
 		if(is_null($this->devID) || is_null($this->devToken)){
 			return false;
 		}
-		if(!$this->dbDevCheck()){
+		if($this->dbDevCheck()){
 			return false;
 		}
 		$authSQL = "SELECT `DevToken` FROM Device WHERE DevID=:DevID";
 		$authPre = $this->dbh->prepare($authSQL);
-		$authPre->bindvalue(":DevID",$this->devID,PDO::PARAM_STR);
+		$authPre->bindValue(":DevID",$this->devID,PDO::PARAM_STR);
 		if($authPre->execute()){
 			$dbToken = ($authPre->fetch())['DevToken'];
 			return $dbToken == $this->devToken;
@@ -57,7 +57,7 @@ class Devinfo{
 		}
 		$Checksql = "SELECT COUNT(DevID) FROM Device WHERE DevID = :DevID";
 		$Checkpre = $this->dbh->prepare($Checksql);
-		$Checkpre->bindvalue(":DevID",$this->devID,PDO::PARAM_INT);
+		$Checkpre->bindValue(":DevID",$this->devID,PDO::PARAM_INT);
 		if($Checkpre->execute()){
 			if($Checkpre->fetchColumn() == 0){
 				return true;

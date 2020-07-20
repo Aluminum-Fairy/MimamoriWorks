@@ -25,12 +25,12 @@ class UserInfo{
 		if(is_null($this->mailAddr) || is_null($this->Passwd)){
 			return false;
 		}
-		if(!$this->dbUICheck()){
+		if($this->dbUICheck()){
 			return false;
 		}
 		$authSQL="SELECT `Passwd` FROM user WHERE mailaddr = :mail";
 		$authPre=$this->dbh->prepare($authSQL);
-		$authPre->bindvalue(":mail",$this->mailAddr,PDO::PARAM_STR);
+		$authPre->bindValue(":mail",$this->mailAddr,PDO::PARAM_STR);
 		if($authPre->execute()){
 			$dbPasswd=($authPre->fetch())['Passwd'];
 			return password_verify($this->Passwd,$dbPasswd);
@@ -56,7 +56,7 @@ class UserInfo{
 		}
 		$checkSQL = "SELECT COUNT(id) FROM user WHERE mailaddr = :mailAddr";
 		$checkPre = $this->dbh->prepare($checkSQL);
-		$checkPre->bindvalue(":mailAddr",$this->mailAddr,PDO::PARAM_STR);
+		$checkPre->bindValue(":mailAddr",$this->mailAddr,PDO::PARAM_STR);
 		if($checkPre->execute()){
 			if($checkPre->fetchColumn() == 0){
 				return true;

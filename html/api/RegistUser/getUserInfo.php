@@ -12,8 +12,8 @@ class RegUI extends UserInfo{
 	public function setUI2db(){
 		$regUIsql="INSERT INTO user (`name`,`mailaddr`,`Passwd`) values (:name,:mailAddr,:PasswdHash)";
 		$regUIpre=$this->dbh->prepare($regUIsql);
-		$regUIpre->bindvalue(":name",$this->userName,PDO::PARAM_STR);
-		$regUIpre->bindvalue(":mailAddr",$this->mailAddr,PDO::PARAM_STR);
+		$regUIpre->bindValue(":name",$this->userName,PDO::PARAM_STR);
+		$regUIpre->bindValue(":mailAddr",$this->mailAddr,PDO::PARAM_STR);
 		$regUIpre->bindValue(":PasswdHash",password_hash($this->Passwd, PASSWORD_DEFAULT),PDO::PARAM_STR);
 		return $regUIpre->execute();
 	}
