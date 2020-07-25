@@ -7,22 +7,27 @@ $Response;
 $acInfo = new ACInfo($dsn, $db_user, $db_pass);
 $devInfo = new DevInfo($dsn, $db_user, $db_pass);
 
-if(filter_input(INPUT_POST,'devID',FILTER_VALIDATE_FLOAT)){
+if(filter_input(INPUT_POST,'devID',FILTER_VALIDATE_FLOAT) && filter_input(INPUT_POST,'devToken')){
 	$devInfo->inputDevID($_POST['devID']);
-}
-if(filter_input(INPUT_POST,'devToken')){
 	$devInfo->inputDevToken($_POST['devToken']);
 }
 
 if($devInfo->devAuth()){
-	$acInfo->inputSettingID(1);
-	$acStatus=$acInfo->acStatus();
+	$Response = array('Auth_Result'=>true);
+	if($acInfo->srchSettingID($devInfo->getDevID())){
+		foreach($acInfo->getSettingIDrow() as $settingID){
+			if($acStatus=$acInfo->acStatus($settingID['settingID'])){
+				$Response +=array($settingID['settingID']=>array('AC_Config'=>array('acName'=>$acStatus['ACname'])));
+				$Response[$settingID['settingID']]['AC_Config'] +=array('temp'=>$acStatus['temp']);
+				$Response[$settingID['settingID']]['AC_Config'] +=array('mode'=>$acStatus['mode']);
+				$Response[$settingID['settingID']]['AC_Config'] +=array('volume'=>$acStatus['volume']);
+			}
+		}
+	}
 
-	$Response = array('acName'=>$acStatus['ACname']);
-	$Response +=array('temp'=>$acStatus['temp']);
-	$Response +=array('mode'=>$acStatus['mode']);
-	$Response +=array('volume'=>$acStatus['volume']);
-
-	echo json_encode($Response);
+}else{
+	$Response = array('Auth_Result'=>false);
 }
+
+echo json_encode($Response);
 

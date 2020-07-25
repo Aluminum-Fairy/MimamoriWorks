@@ -32,23 +32,23 @@ if(filter_input(INPUT_POST,'UserName')){
 
 if(filter_input(INPUT_POST,'mailAddr',FILTER_VALIDATE_EMAIL)){
 	$regUI->inputMail($_POST['mailAddr']);
-	$Response = array_merge($Response,array('Mail'=>true));
+	$Response +=array('Mail'=>true);
 }else{
-	$Response = array_merge($Response,array('Mail'=>false));
+	$Response +=array('Mail'=>false);
 }
 
 if(filter_input(INPUT_POST,'Passwd')){
 	$regUI->inputPasswd($_POST['Passwd']);
-	$Response = array_merge($Response,array('Passwd'=>true));
+	$Response +=array('Passwd'=>true);
 }else{
-	$Response = array_merge($Response,array('Passwd'=>false));
+	$Response +=array('Passwd'=>false);
 }
 
 if($regUI->dbUICheck()){
-	$Response = array_merge($Response,array('DB_Result'=>array('RegistUI'=>$regUI->setUI2db())));
+	$Response +=array('DB_Result'=>array('RegistUI'=>$regUI->setUI2db()));
 	$Response['DB_Result'] +=array('Duplication'=>false);
 }else{
-	$Response = array_merge($Response,array('DB_Result'=>array('RegistUI'=>false)));
+	$Response +=array('DB_Result'=>array('RegistUI'=>false));
 	$Response['DB_Result'] +=array('Duplication'=>true);
 }
 

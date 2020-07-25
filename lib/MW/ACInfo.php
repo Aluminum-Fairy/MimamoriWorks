@@ -1,6 +1,7 @@
 <?php
 class ACInfo{
-	protected $settingID;
+	protected $settingIDrow;
+	protected $acNum;
 	protected $acName;
 	protected $acMode;
 	protected $acVolume;
@@ -8,10 +9,6 @@ class ACInfo{
 
 	function __construct($dsn, $db_user, $db_pass){
 		$this->dbh = new PDO($dsn, $db_user, $db_pass);
-	}
-
-	public function inputSettingID($input){
-		$this->settingID = $input;
 	}
 
 	public function inputACname($input){
@@ -26,13 +23,31 @@ class ACInfo{
 		$this->acVolue = $input;
 	}
 
-	public function acStatus(){
-		if(is_null($this->settingID)){
+	public function getSettingIDrow(){
+		if(is_null($this->settingIDrow)){
 			return false;
 		}
-		$getStatusSql="SELECT `ACname`,`temp`,`mode`,`volume` FROM `airCon` WHERE `settingID`=:settingID";
+		return $this->settingIDrow;
+	}
+
+	public function srchSettingID($devID){
+		$srchIDsql="SELECT settingID FROM `AC_Dev` WHERE `DevID` = :devID";
+		$srchIDpre=$this->dbh->prepare($srchIDsql);
+		$srchIDpre->bindValue(":devID",$devID,PDO::PARAM_STR);
+		if($srchIDpre->execute()){
+			$this->settingIDrow = $srchIDpre->fetchAll();
+			return true;
+		}
+		return false;
+	}
+
+	public function acStatus($settingID){
+		if(is_null($settingID)){
+			return false;
+		}
+		$getStatusSql="SELECT `ACname`,`temp`,`mode`,`volume` FROM `AC_config` WHERE `settingID`=:settingID";
 		$getStatusPre=$this->dbh->prepare($getStatusSql);
-		$getStatusPre->bindValue(":settingID",$this->settingID,PDO::PARAM_STR);
+		$getStatusPre->bindValue(":settingID",$settingID,PDO::PARAM_STR);
 		if($getStatusPre->execute()){
 			return $getStatusPre->fetch();
 		}

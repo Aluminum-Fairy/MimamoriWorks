@@ -26,6 +26,13 @@ class Devinfo{
 		$this->devToken = $input;
 	}
 
+	public function getDevID(){
+		if(is_null($this->devID)){
+			return false;
+		}
+		return $this->devID;
+	}
+
 	public function getDevToken(){
 		return $this->devToken;
 	}

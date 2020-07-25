@@ -48,47 +48,46 @@ if(filter_input(INPUT_POST,'devID',FILTER_VALIDATE_INT)){
 
 if(filter_input(INPUT_POST,'devName')){
 	$regDev->inputDevName($_POST['devName']);
-	$Response = array_merge($Response,array('devName'=>true));
+	$Response +=array('devName'=>true);
 }else{
-	$Response = array_merge($Response,array('devName'=>false));
+	$Response +=array('devName'=>false);
 }
 
 if(filter_input(INPUT_POST,'devExpl')){
 	$regDev->inputDevExpl($_POST['devExpl']);
-	$Response = array_merge($Response,array('devExpl'=>true));
+	$Response +=array('devExpl'=>true);
 }else{
-	$Response = array_merge($Response,array('devExpl'=>false));
+	$Response +=array('devExpl'=>false);
 }
 
 if(filter_input(INPUT_POST,'mailAddr',FILTER_VALIDATE_EMAIL)){
 	$userInfo->inputMail($_POST['mailAddr']);
-	$Response = array_merge($Response,array('Mail'=>true));
+	$Response +=array('Mail'=>true);
 }else{
-	$Response = array_merge($Response,array('Mail'=>false));
+	$Response +=array('Mail'=>false);
 }
 
 if(filter_input(INPUT_POST,'Passwd')){
 	$userInfo->inputPasswd($_POST['Passwd']);
-	$Response = array_merge($Response,array('Passwd'=>true));
+	$Response +=array('Passwd'=>true);
 }else{
-	$Response = array_merge($Response,array('Passwd'=>false));
+	$Response +=array('Passwd'=>false);
 }
 
 if($userInfo->userAuth()){
-	$Response = array_merge($Response,array('DB_Result'=>array('Auth'=>true)));
+	$Response += array('Auth_Result'=>true);
 	if($regDev->dbDevCheck()){
+		$Response +=array('DB_Result'=>array('Duplication'=>false));
 		$Response['DB_Result'] +=array('Duplication'=>false);
 		$Response['DB_Result'] +=array('RegDev'=>$regDev->setDev2db());
 		$Response['DB_Result'] +=array('DevToken'=>$regDev->getDevToken());
 		$Response['DB_Result'] +=array('getToken'=>true);
 	}else{
-		$Response['DB_Result'] +=array('Duplication'=>true);
+		$Response += array('DB_Result'=>array('Duplication'=>true));
 		$Response['DB_Result'] +=array('AddDevDescriptions'=>$regDev->devDesc());
 		$Response['DB_Result'] +=array('getToken'=>false);
 	}
 }else{
-	$Response = array_merge($Response,array('DB_Result'=>array('Auth'=>false)));
+	$Response +=array('Auth_Result'=>false);
 }
-
-$ResJ = json_encode($Response);
-echo $ResJ;
+echo json_encode($Response);
