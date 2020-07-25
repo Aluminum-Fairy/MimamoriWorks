@@ -15,7 +15,9 @@ if(filter_input(INPUT_POST,'devID',FILTER_VALIDATE_FLOAT) && filter_input(INPUT_
 if($devInfo->devAuth()){
 	$Response = array('Auth_Result'=>true);
 	if($acInfo->srchSettingID($devInfo->getDevID())){
-		foreach($acInfo->getSettingIDrow() as $settingID){
+		$settingIDrow = $acInfo->getSettingIDrow();
+		$Response += array('AC_Count'=>Count($settingIDrow));
+		foreach($settingIDrow as $settingID){
 			if($acStatus=$acInfo->acStatus($settingID['settingID'])){
 				$Response +=array($settingID['settingID']=>array('AC_Config'=>array('acName'=>$acStatus['ACname'])));
 				$Response[$settingID['settingID']]['AC_Config'] +=array('temp'=>$acStatus['temp']);
@@ -24,7 +26,6 @@ if($devInfo->devAuth()){
 			}
 		}
 	}
-
 }else{
 	$Response = array('Auth_Result'=>false);
 }
