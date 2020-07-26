@@ -16,13 +16,10 @@ if($devInfo->devAuth()){
 	$Response = array('Auth_Result'=>true);
 	if($acInfo->srchSettingID($devInfo->getDevID())){
 		$settingIDrow = $acInfo->getSettingIDrow();
-		$Response += array('AC_Count'=>Count($settingIDrow));
+		$Response+=array('AC_Statuses'=>array());
 		foreach($settingIDrow as $settingID){
 			if($acStatus=$acInfo->acStatus($settingID['settingID'])){
-				$Response +=array($settingID['settingID']=>array('AC_Config'=>array('acName'=>$acStatus['ACname'])));
-				$Response[$settingID['settingID']]['AC_Config'] +=array('temp'=>$acStatus['temp']);
-				$Response[$settingID['settingID']]['AC_Config'] +=array('mode'=>$acStatus['mode']);
-				$Response[$settingID['settingID']]['AC_Config'] +=array('volume'=>$acStatus['volume']);
+				$Response['AC_Statuses']+=array($settingID['settingID']=>$acStatus);
 			}
 		}
 	}

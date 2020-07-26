@@ -52,5 +52,4 @@ if($regUI->dbUICheck()){
 	$Response['DB_Result'] +=array('Duplication'=>true);
 }
 
-$ResJ = json_encode($Response);
-echo $ResJ;
+echo json_encode($Response);

@@ -49,7 +49,7 @@ class ACInfo{
 		$getStatusPre=$this->dbh->prepare($getStatusSql);
 		$getStatusPre->bindValue(":settingID",$settingID,PDO::PARAM_STR);
 		if($getStatusPre->execute()){
-			return $getStatusPre->fetch();
+			return $getStatusPre->fetch(PDO::FETCH_ASSOC|PDO::FETCH_UNIQUE);
 		}
 		return false;
 	}
