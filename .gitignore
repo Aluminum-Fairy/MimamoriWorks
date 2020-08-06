@@ -1,2 +1,5 @@
 html/db/
 config/SQL_Login.php
+CPS/
+StopService.sh
+html/index.php

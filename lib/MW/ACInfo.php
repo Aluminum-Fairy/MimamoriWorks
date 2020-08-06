@@ -45,7 +45,7 @@ class ACInfo{
 		if(is_null($settingID)){
 			return false;
 		}
-		$getStatusSql="SELECT `ACname`,`temp`,`mode`,`volume` FROM `AC_config` WHERE `settingID`=:settingID";
+		$getStatusSql="SELECT `ACname`,`temp`,`mode`,`volume` ,`rcID`FROM `AC_config` WHERE `settingID`=:settingID";
 		$getStatusPre=$this->dbh->prepare($getStatusSql);
 		$getStatusPre->bindValue(":settingID",$settingID,PDO::PARAM_STR);
 		if($getStatusPre->execute()){
